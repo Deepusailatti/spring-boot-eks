@@ -1,0 +1,25 @@
+{
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "family": "fargate",
+    "containerDefinitions": [
+        {
+            "name": "nodejs",
+            "image": "723446198494.dkr.ecr.us-east-2.amazonaws.com/latti99:latest",
+            "essential": true,
+            "portMappings": [
+          {
+            "hostPort":3000,
+            "containerPort":3000,
+            "protocol": "tcp"
+          }
+        ]
+        }
+    ],
+    "volumes": [],
+    "networkMode": "awsvpc",
+    "memory": "3 GB",
+    "cpu": "1 vCPU",
+    "executionRoleArn": "arn:aws:iam::339095555060:role/ecsTaskExecutionRole"
+}
