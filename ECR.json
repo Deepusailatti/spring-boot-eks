@@ -1,0 +1,38 @@
+pipeline{
+    agent any
+    environment {
+        // IMAGE_TAG=$(git rev-parse HEAD | cut -c 1-8)
+        IMAGE_TAG="latest"
+    }
+    stages {
+        stage('Code Clone'){
+            steps{
+                git 'https://github.com/Manoj3699/spring-boot-eks.git'
+            }
+        }
+        stage('Docker Build'){
+            steps{
+                sh 'sudo docker build -t latti99:$IMAGE_TAG .'
+                sh 'sudo docker tag latti99:latest 723446198494.dkr.ecr.us-east-2.amazonaws.com/latti99:$IMAGE_TAG'
+            }
+        }
+		- set -x
+        stage('AWS ECR Login') {
+            steps{
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    accessKeyVariable: 'AKIA2Q4GA6DPCHRBBKCM',
+                    secretKeyVariable: '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']]){
+                        sh 'aws ecr get-login-password --region us-east-2 | sudo docker login --username AWS --password-stdin 723446198494.dkr.ecr.ap-south-1.amazonaws.com'
+                        sh 'sudo docker push 723446198494.dkr.ecr.us-east-2.amazonaws.com/latti99:$IMAGE_TAG'
+                    }
+            }
+        }
+        stage('Local Docker Image Remove'){
+            steps{
+                sh 'sudo docker rmi latti99:$IMAGE_TAG'
+                sh 'sudo docker rmi 723446198494.dkr.ecr.us-east-2.amazonaws.com/latti99:$IMAGE_TAG'
+            }
+        }
+    }
+}
